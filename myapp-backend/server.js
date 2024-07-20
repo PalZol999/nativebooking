@@ -83,9 +83,11 @@ app.post('/login', async (req, res) => {
 app.post('/api/signin', async (req, res) => {
   const { first_name, last_name, appointment_date } = req.body;
 
+  if (!first_name || !last_name || !appointment_date) {
+    return res.status(400).send({ error: 'All fields are required' });
+  }
+
   try {
-    // Here you should insert the user into your database or perform any other necessary operations.
-    // For example, assuming you have a table named 'signed_in_users':
     const insertQuery = `
       INSERT INTO signed_in(first_name, last_name, appointment_date)
       VALUES ($1, $2, $3)
