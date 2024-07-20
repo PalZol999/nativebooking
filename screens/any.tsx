@@ -9,7 +9,7 @@ import nodate from '../assets/banana.png';
 import Header from '../component/Header';
 import { RootStackParamList } from '../navigation/types';
 import useFetchUserData from '../controller/fetchUserData';
-import handleAddPress from '../controller/depc_handleAddPress'; // Importing handleAddPress
+import handleAddPress from '../controller/handlePress'; // Importing handleAddPress
 
 type MyDatePickerNavigationProp = StackNavigationProp<RootStackParamList, 'MyDatePicker'>;
 
@@ -48,6 +48,10 @@ export default function MyDatePicker() {
     alert('Profile pressed');
   };
 
+  const handleClosePress = () => {
+    setShow(false); // Close the date picker
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -77,9 +81,14 @@ export default function MyDatePicker() {
               <Text style={styles.description}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </Text>
-              <TouchableOpacity onPress={handleAddPressWrapper}>
-                <Text style={styles.addText}>Add</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity onPress={handleAddPressWrapper}>
+                  <Text style={styles.addText}>Add</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClosePress} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -201,6 +210,21 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   closeButtonText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
+  },
+  closeButtonContainer: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  closeButtonTextContainer: {
     color: 'white',
     fontSize: 16,
   },
