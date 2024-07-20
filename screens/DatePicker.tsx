@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View, Platform, Image, StyleSheet, Text, Modal, Alert, StatusBar } from 'react-native';
+import { TouchableOpacity, View, Platform, Image, StyleSheet, Text, Modal, StatusBar } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
@@ -17,15 +17,23 @@ export default function MyDatePicker() {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [showCard, setShowCard] = useState(true); // New state for card visibility
+  const [showCard, setShowCard] = useState(false); // Initially hidden
 
   const user = useFetchUserData();
   const navigation = useNavigation<MyDatePickerNavigationProp>();
 
   const onChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios'); // Keep the picker open on iOS
     setDate(currentDate);
+
+    // Check if the date is valid and set the card visibility
+    if (isValidAppointmentDate(currentDate)) {
+      setShowCard(true);
+    } else {
+      setShowCard(false);
+    }
+
+    setShow(Platform.OS === 'ios'); // Keep the picker open on iOS
   };
 
   const showMode = (currentMode: 'date' | 'time') => {
@@ -39,6 +47,7 @@ export default function MyDatePicker() {
 
   const handleAddPressWrapper = () => {
     handleAddPress(user!, date, setModalVisible);
+    setShowCard(false); // Hide the card after adding
   };
 
   const handleLogout = () => {
@@ -50,7 +59,7 @@ export default function MyDatePicker() {
   };
 
   const handleClosePress = () => {
-    setShowCard(false); // Set showCard to false to hide the card
+    setShowCard(false); // Hide the card
   };
 
   return (
@@ -72,7 +81,7 @@ export default function MyDatePicker() {
         )}
         <Image source={nodate} style={styles.images} />
       </View>
-      {isValidAppointmentDate(date) && showCard && (
+      {showCard && (
         <View style={styles.cardContainer}>
           <View style={styles.card}>
             <Image source={CoachImage} style={styles.coachImage} />
@@ -218,15 +227,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
-  },
-  closeButtonContainer: {
-    backgroundColor: 'red',
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 10,
-  },
-  closeButtonTextContainer: {
-    color: 'white',
-    fontSize: 16,
   },
 });
