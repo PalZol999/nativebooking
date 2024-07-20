@@ -106,7 +106,7 @@ export default function MyDatePicker() {
       >
         <View style={styles.modalView}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalText}>You have been added to the 6:00am course: {date.toDateString()}</Text>
+            <Text style={styles.modalText}>You have been added to the super 6:00am course: {date.toDateString()}</Text>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(!modalVisible)}
