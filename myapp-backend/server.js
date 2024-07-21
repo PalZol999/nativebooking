@@ -6,7 +6,7 @@ const cors = require('cors'); // Import cors package
 
 const app = express();
 app.use(bodyParser.json());
-const port= 3000
+const port = 3000;
 
 const pool = new Pool({
   user: 'postgres',
@@ -40,34 +40,26 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
 // Routes for login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user with provided email exists in the database
     const userQuery = 'SELECT * FROM users WHERE email = $1';
     const userResult = await pool.query(userQuery, [email]);
 
     if (userResult.rows.length === 0) {
-      // User with provided email not found
       return res.status(404).json({ message: 'User not found' });
     }
 
     const user = userResult.rows[0];
-
-    // Compare hashed password with provided password
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
       return res.status(401).json({ message: 'Incorrect password' });
     }
 
-    // Extract first_name and last_name from user
     const { first_name, last_name } = user;
-
-    // Send response with user data
     res.status(200).json({
       message: 'Login successful',
       user: { first_name, last_name }
@@ -78,8 +70,30 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Endpoint to check if booking already exists
+app.post('/api/checkBooking', async (req, res) => {
+  const { first_name, last_name, appointment_date } = req.body;
 
-// signing for chosen date
+  if (!first_name || !last_name || !appointment_date) {
+    return res.status(400).send({ error: 'All fields are required' });
+  }
+
+  try {
+    const checkQuery = `
+      SELECT * FROM signed_in
+      WHERE first_name = $1 AND last_name = $2 AND appointment_date = $3
+    `;
+    const values = [first_name, last_name, appointment_date];
+    const result = await pool.query(checkQuery, values);
+
+    res.json({ exists: result.rows.length > 0 });
+  } catch (err) {
+    console.error('Error checking booking:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Signing in for a chosen date
 app.post('/api/signin', async (req, res) => {
   const { first_name, last_name, appointment_date } = req.body;
 
@@ -93,11 +107,9 @@ app.post('/api/signin', async (req, res) => {
       VALUES ($1, $2, $3)
       RETURNING *
     `;
-    
     const values = [first_name, last_name, appointment_date];
     const result = await pool.query(insertQuery, values);
 
-    // Return the inserted record as JSON response
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error('Error inserting into signed_in:', err.message);
@@ -105,7 +117,6 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
-
-app.listen(3000, () => {
-  console.log('Server is running on http://localhost:3000');
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
