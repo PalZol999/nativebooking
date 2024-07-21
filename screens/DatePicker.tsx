@@ -10,6 +10,7 @@ import Header from '../component/Header';
 import { RootStackParamList } from '../navigation/types';
 import useFetchUserData from '../controller/fetchUserData';
 import handleAddPress from '../controller/handlePress'; // Importing handleAddPress
+import ProfileScreen from './ProfileScreen';
 
 type MyDatePickerNavigationProp = StackNavigationProp<RootStackParamList, 'MyDatePicker'>;
 
@@ -55,7 +56,7 @@ export default function MyDatePicker() {
   };
 
   const handleProfile = () => {
-    alert('Profile pressed');
+    navigation.navigate('ProfileScreen');
   };
 
   const handleClosePress = () => {

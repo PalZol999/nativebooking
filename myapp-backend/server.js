@@ -117,6 +117,52 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
+// Get all bookings for a user
+app.get('/api/bookings', async (req, res) => {
+  const { first_name, last_name } = req.query;
+
+  if (!first_name || !last_name) {
+    return res.status(400).send({ error: 'First name and last name are required' });
+  }
+
+  try {
+    const query = `
+      SELECT * FROM signed_in
+      WHERE first_name = $1 AND last_name = $2
+    `;
+    const values = [first_name, last_name];
+    const result = await pool.query(query, values);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error fetching bookings:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
+// Cancel a booking
+app.delete('/api/bookings', async (req, res) => {
+  const { first_name, last_name, appointment_date } = req.body;
+
+  if (!first_name || !last_name || !appointment_date) {
+    return res.status(400).send({ error: 'All fields are required' });
+  }
+
+  try {
+    const deleteQuery = `
+      DELETE FROM signed_in
+      WHERE first_name = $1 AND last_name = $2 AND appointment_date = $3
+    `;
+    const values = [first_name, last_name, appointment_date];
+    await pool.query(deleteQuery, values);
+
+    res.status(200).send({ message: 'Booking cancelled successfully' });
+  } catch (err) {
+    console.error('Error cancelling booking:', err.message);
+    res.status(500).send('Server error');
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
