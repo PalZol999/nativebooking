@@ -50,17 +50,28 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
-  const renderItem = ({ item }: { item: Booking }) => (
-    <View style={styles.bookingItem}>
-      <Text style={styles.bookingText}>Date: {new Date(item.appointment_date).toDateString()}</Text>
-      <TouchableOpacity
-        style={styles.cancelButton}
-        onPress={() => cancelBooking(item.appointment_date)}
-      >
-        <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderItem = ({ item }: { item: Booking }) => {
+    // Create a new date object from the appointment date
+    let appointmentDate = new Date(item.appointment_date);
+  
+    // Add one day to the date
+    appointmentDate.setDate(appointmentDate.getDate() + 1);
+  
+    // Format the date to "YYYY-MM-DD"
+    const formattedDate = appointmentDate.toISOString().split('T')[0];
+  
+    return (
+      <View style={styles.bookingItem}>
+        <Text style={styles.bookingText}>Date: {formattedDate}</Text>
+        <TouchableOpacity
+          style={styles.cancelButton}
+          onPress={() => cancelBooking(formattedDate)}  // Pass the correct format
+        >
+          <Text style={styles.cancelButtonText}>Cancel</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   if (!user) {
     return <Text>Loading...</Text>; // Or any other loading indicator

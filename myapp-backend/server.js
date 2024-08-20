@@ -144,7 +144,7 @@ app.get('/api/bookings', async (req, res) => {
 app.delete('/api/bookings', async (req, res) => {
   const { first_name, last_name, appointment_date } = req.body;
 
-  
+  console.log('Received delete request:', req.body); // Log request body
 
   if (!first_name || !last_name || !appointment_date) {
     return res.status(400).send({ error: 'All fields are required' });
@@ -153,18 +153,25 @@ app.delete('/api/bookings', async (req, res) => {
   try {
     const deleteQuery = `
       DELETE FROM signed_in
-      WHERE first_name = $1 AND last_name = $2 AND appointment_date = $3
+      WHERE first_name = $1 AND last_name = $2 AND appointment_date::date = $3::timestamp(0)
     `;
     const values = [first_name, last_name, appointment_date];
-    await pool.query(deleteQuery, values);
-    console.log(`Rows affected: ${result.rowCount}`); 
+    const result = await pool.query(deleteQuery, values);
+
+    console.log('Rows affected:', result.rowCount); // Log number of rows affected
+
+    if (result.rowCount === 0) {
+      return res.status(404).send({ error: 'Booking not found' });
+    }
 
     res.status(200).send({ message: 'Booking cancelled successfully' });
   } catch (err) {
     console.error('Error cancelling booking:', err.message);
-    res.status(500).send('Server error');
+    res.status(500).send({ error: 'Server error' });
   }
 });
+
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
