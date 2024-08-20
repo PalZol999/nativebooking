@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    padding: 50,
     backgroundColor: '#5257F2',
   },
   headerButton: {

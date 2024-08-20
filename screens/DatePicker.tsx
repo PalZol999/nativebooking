@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { TouchableOpacity, View, Platform, Image, StyleSheet, Text, Modal, Alert } from 'react-native';
+import { TouchableOpacity, View, Platform, Image, StyleSheet, Text, Modal, StatusBar } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import HeaderImage from '../assets/DateImage1.jpg';
 import CoachImage from '../assets/coach.jpeg';
 import nodate from '../assets/banana.png';
-import { StatusBar } from 'react-native';
 import Header from '../component/Header';
 import { RootStackParamList } from '../navigation/types';
-import handlePress from '../controller/handlePress'; 
 import useFetchUserData from '../controller/fetchUserData';
-
+import handleAddPress from '../controller/handlePress'; // Importing handleAddPress
+import ProfileScreen from './ProfileScreen';
 
 type MyDatePickerNavigationProp = StackNavigationProp<RootStackParamList, 'MyDatePicker'>;
 
@@ -19,16 +18,23 @@ export default function MyDatePicker() {
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  
-  // controller/fetchUserData
-  const user = useFetchUserData();
+  const [showCard, setShowCard] = useState(false); // Initially hidden
 
+  const user = useFetchUserData();
   const navigation = useNavigation<MyDatePickerNavigationProp>();
-  
+
   const onChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate || date;
-    setShow(Platform.OS === 'ios'); // Keep the picker open on iOS
     setDate(currentDate);
+
+    // Check if the date is valid and set the card visibility
+    if (isValidAppointmentDate(currentDate)) {
+      setShowCard(true);
+    } else {
+      setShowCard(false);
+    }
+
+    setShow(Platform.OS === 'ios'); // Keep the picker open on iOS
   };
 
   const showMode = (currentMode: 'date' | 'time') => {
@@ -40,9 +46,9 @@ export default function MyDatePicker() {
     return day === 1 || day === 3 || day === 5; // Monday, Wednesday, Friday
   };
 
-  // controller/handlePress
   const handleAddPressWrapper = () => {
-    handlePress(user!, date, setModalVisible);
+    handleAddPress(user!, date, setModalVisible);
+    setShowCard(false); // Hide the card after adding
   };
 
   const handleLogout = () => {
@@ -50,18 +56,18 @@ export default function MyDatePicker() {
   };
 
   const handleProfile = () => {
-    // Handle profile logic here
-    alert('Profile pressed');
+    navigation.navigate('ProfileScreen');
+  };
+
+  const handleClosePress = () => {
+    setShowCard(false); // Hide the card
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <Header onLogout={handleLogout} onProfile={handleProfile} />
-      <Image
-        source={HeaderImage}
-        style={styles.image}
-      />
+      <Image source={HeaderImage} style={styles.image} />
       <View style={styles.datePickerContainer}>
         <TouchableOpacity onPress={() => showMode('date')} style={styles.button}>
           <Text style={{ color: 'yellow', fontSize: 18 }}>Show Date Picker</Text>
@@ -76,22 +82,24 @@ export default function MyDatePicker() {
         )}
         <Image source={nodate} style={styles.images} />
       </View>
-      {isValidAppointmentDate(date) && (
+      {showCard && (
         <View style={styles.cardContainer}>
           <View style={styles.card}>
-            <Image
-              source={CoachImage}
-              style={styles.coachImage}
-            />
+            <Image source={CoachImage} style={styles.coachImage} />
             <View style={styles.textContainer}>
               <Text style={styles.coachName}>Zoltan "Pierre" Palasti</Text>
               <Text style={styles.coachName}>6:00 am</Text>
               <Text style={styles.description}>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
               </Text>
-              <TouchableOpacity onPress={handleAddPressWrapper}>
-                <Text style={styles.addText}>Add</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity onPress={handleAddPressWrapper}>
+                  <Text style={styles.addText}>Add</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleClosePress} style={styles.closeButton}>
+                  <Text style={styles.closeButtonText}>Close</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -215,5 +223,10 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: 'white',
     fontSize: 16,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
 });

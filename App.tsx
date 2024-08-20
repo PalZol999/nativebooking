@@ -10,3 +10,10 @@ export default function App() {
     </>
   );
 }
+
+
+
+
+
+// 1. terminal: go to "myapp-backend" > node server
+// 2. terminal: npm start

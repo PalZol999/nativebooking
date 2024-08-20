@@ -5,6 +5,7 @@ import Loading from '../screens/LoadingScreen';
 import Register from '../screens/RegisterScreen';
 import MyDatePicker from '../screens/DatePicker'
 import Login from '../screens/LoginScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ export default function Navigation() {
       }}/>
         <Stack.Screen name="LoginScreen" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="MyDatePicker" component={MyDatePicker} options={{ headerShown: false }} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }}  />
 
   </Stack.Navigator>
     </NavigationContainer>
