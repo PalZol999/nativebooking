@@ -144,6 +144,8 @@ app.get('/api/bookings', async (req, res) => {
 app.delete('/api/bookings', async (req, res) => {
   const { first_name, last_name, appointment_date } = req.body;
 
+  
+
   if (!first_name || !last_name || !appointment_date) {
     return res.status(400).send({ error: 'All fields are required' });
   }
@@ -155,6 +157,7 @@ app.delete('/api/bookings', async (req, res) => {
     `;
     const values = [first_name, last_name, appointment_date];
     await pool.query(deleteQuery, values);
+    console.log(`Rows affected: ${result.rowCount}`); 
 
     res.status(200).send({ message: 'Booking cancelled successfully' });
   } catch (err) {
