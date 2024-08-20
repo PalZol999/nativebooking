@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6a51ae',
     padding: 10,
     borderRadius: 5,
-    marginBottom: 20,
+    marginBottom: 21,
     alignSelf: 'flex-start',
   },
   backButtonText: {
